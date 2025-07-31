@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # lets you manually trigger this workflow from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -21,9 +21,9 @@ jobs:
       - name: Run status checker script
         run: python check_status.py
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: your-app-name
+          app-name: mystatuspage            # Your actual Azure Web App name
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
