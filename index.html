@@ -1,23 +1,42 @@
 <!DOCTYPE html>
-<html>
-<head><title>Azure Status Page</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Service Status</title>
+</head>
 <body>
-<h1>Service Status</h1>
-<ul id="status"></ul>
+  <h1>Service Status</h1>
+  <div id="status">Loading status...</div>
 
-<script>
-fetch('status.json')
-  .then(r => r.json())
-  .then(data => {
-    const list = document.getElementById('status');
-    data.forEach(s => {
-      const li = document.createElement('li');
-      li.textContent = `${s.name}: ${s.status.toUpperCase()} (${s.response_time_ms ?? 'N/A'} ms) at ${new Date(s.checked_at).toLocaleTimeString()}`;
-      li.style.color = s.status === 'up' ? 'green' : 'red';
-      list.appendChild(li);
-    });
-  })
-  .catch(() => document.getElementById('status').textContent = 'Could not load status.');
-</script>
+  <script>
+    fetch('status.json')
+      .then(response => {
+        if (!response.ok) throw new Error('HTTP error ' + response.status);
+        return response.json();
+      })
+      .then(data => {
+        const statusDiv = document.getElementById('status');
+        if (!data.length) {
+          statusDiv.textContent = 'No services found.';
+          return;
+        }
+
+        let html = '<ul>';
+        data.forEach(service => {
+          html += `<li>
+            <strong>${service.name}</strong>: 
+            ${service.status.toUpperCase()} 
+            ${service.response_time_ms !== null ? `(${service.response_time_ms} ms)` : ''}
+            <br/><small>Checked at: ${new Date(service.checked_at).toLocaleString()}</small>
+          </li>`;
+        });
+        html += '</ul>';
+        statusDiv.innerHTML = html;
+      })
+      .catch(error => {
+        document.getElementById('status').textContent = 'Could not load status.';
+        console.error('Fetch error:', error);
+      });
+  </script>
 </body>
 </html>
