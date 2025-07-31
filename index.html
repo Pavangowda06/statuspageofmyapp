@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><title>Azure Status Page</title></head>
+<body>
+<h1>Service Status</h1>
+<ul id="status"></ul>
+
+<script>
+fetch('status.json')
+  .then(r => r.json())
+  .then(data => {
+    const list = document.getElementById('status');
+    data.forEach(s => {
+      const li = document.createElement('li');
+      li.textContent = `${s.name}: ${s.status.toUpperCase()} (${s.response_time_ms ?? 'N/A'} ms) at ${new Date(s.checked_at).toLocaleTimeString()}`;
+      li.style.color = s.status === 'up' ? 'green' : 'red';
+      list.appendChild(li);
+    });
+  })
+  .catch(() => document.getElementById('status').textContent = 'Could not load status.');
+</script>
+</body>
+</html>
